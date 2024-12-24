@@ -1,13 +1,11 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 from expression_parser import ExpressionParser
 from file_loader import FileLoader
 from graph_plotter import GraphPlotter
 
 
 class GraphApp:
-
     def __init__(self, root):
         self.root = root
         self.root.title("Graph Plotter")
@@ -21,32 +19,40 @@ class GraphApp:
         self.expr_entry = tk.Entry(root, width=50)
         self.expr_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        # Entry для діапазону
+        # Entry для діапазону x
         tk.Label(root, text="Enter x range e.g., -10,10 :").grid(row=1, column=0, padx=10, pady=5)
-        self.range_entry = tk.Entry(root, width=20)
-        self.range_entry.grid(row=1, column=1, padx=10, pady=5)
+        self.range_x_entry = tk.Entry(root, width=20)
+        self.range_x_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        # Entry для діапазону для показу графіка (x, y)
+        tk.Label(root, text="Enter display range e.g., -10,10,-10,10 :").grid(row=2, column=0, padx=10, pady=5)
+        self.range_display_entry = tk.Entry(root, width=20)
+        self.range_display_entry.grid(row=2, column=1, padx=10, pady=5)
 
         # Dropdown для вибору кольору
-        tk.Label(root, text="Select line color:").grid(row=2, column=0, padx=10, pady=5)
+        tk.Label(root, text="Select line color:").grid(row=3, column=0, padx=10, pady=5)
         self.color_var = tk.StringVar(value="blue")
-        self.color_dropdown = ttk.Combobox(root, textvariable=self.color_var, values=["blue", "red", "green", "orange", "purple"])
-        self.color_dropdown.grid(row=2, column=1, padx=10, pady=5)
+        self.color_dropdown = ttk.Combobox(root, textvariable=self.color_var,
+                                           values=["blue", "red", "green", "orange", "purple"])
+        self.color_dropdown.grid(row=3, column=1, padx=10, pady=5)
 
         # Кнопки
-        tk.Button(root, text="Plot Graph", command=self.plot_graph).grid(row=3, column=0, columnspan=2, pady=10)
-        tk.Button(root, text="Load Data from File", command=self.load_file).grid(row=4, column=0, columnspan=2, pady=10)
+        tk.Button(root, text="Plot Graph", command=self.plot_graph).grid(row=4, column=0, columnspan=2, pady=10)
+        tk.Button(root, text="Load Data from File", command=self.load_file).grid(row=5, column=0, columnspan=2, pady=10)
 
         # Список для відображення доданих графіків
-        tk.Label(root, text="Graphs:").grid(row=5, column=0, padx=10, pady=5)
+        tk.Label(root, text="Graphs:").grid(row=6, column=0, padx=10, pady=5)
         self.graph_listbox = tk.Listbox(root, height=5, width=50)
-        self.graph_listbox.grid(row=5, column=1, padx=10, pady=5)
+        self.graph_listbox.grid(row=6, column=1, padx=10, pady=5)
 
-        # Кнопка для видалення вибраного графіка
-        tk.Button(root, text="Delete Selected Graph", command=self.delete_graph).grid(row=6, column=0, columnspan=2, pady=10)
+        # Кнопка для очищення всіх графіків
+        tk.Button(root, text="Clear All Graphs", command=self.clear_all_graphs).grid(row=7, column=0, columnspan=2,
+                                                                                     pady=10)
 
     def plot_graph(self):
         expr = self.expr_entry.get()
-        x_range = self.range_entry.get()
+        range_x = self.range_x_entry.get()
+        range_display = self.range_display_entry.get()
         color = self.color_var.get()
 
         # Перевірка на обмеження кількості графіків
@@ -55,9 +61,20 @@ class GraphApp:
             return
 
         try:
-            x_min, x_max = map(float, x_range.split(','))
+            # Обробка діапазону X
+            x_min, x_max = map(float, range_x.split(','))
+
+            # Обробка діапазону для відображення графіка (X і Y)
+            display_range = list(map(float, range_display.split(',')))
+            if len(display_range) != 4:
+                raise ValueError("Invalid display range. Please enter four values for x and y ranges.")
+
+            x_display_min, x_display_max, y_display_min, y_display_max = display_range
+
             segments = self.parser.parse_expression(expr, x_min, x_max)
-            self.plotter.plot_segments(segments, expr, color=color, first_plot=False)
+            self.plotter.plot_segments(segments, expr, color=color, first_plot=False,
+                                       x_display_range=(x_display_min, x_display_max),
+                                       y_display_range=(y_display_min, y_display_max))
 
             # Додаємо графік до списку
             graph_name = f"Graph {len(self.graphs) + 1}: {expr}"
@@ -91,19 +108,14 @@ class GraphApp:
         for graph in self.graphs:
             self.graph_listbox.insert(tk.END, graph[0])
 
-    def delete_graph(self):
-        selected_index = self.graph_listbox.curselection()
+    def clear_all_graphs(self):
+        # Очищення всіх графіків
+        self.graphs.clear()
+        self.plotter.clear_plot()  # Очищення малюнку
 
-        if not selected_index:
-            messagebox.showerror("Error", "No graph selected.")
-            return
-
-        # Видалення вибраного графіка з списку
-        self.graphs.pop(selected_index[0])
+        # Оновлюємо список графіків
         self.update_graph_list()
 
-        # Видалення графіка з малюнку (якщо це потрібно, можна додати)
-        # Це не є необхідним для основного функціоналу, але можна розширити, якщо є потреба
 
 if __name__ == "__main__":
     tk_root = tk.Tk()
