@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 class GraphPlotter:
     def __init__(self):
         self.default_color = "blue"
-        self.fig = None  # Ініціалізація атрибуту fig
+        self.fig = None
 
     def plot_segments(self, segments, expr, color="blue", first_plot=True, x_display_range=None, y_display_range=None):
         if first_plot:
-            self.fig = plt.figure(figsize=(8, 6))  # Створення нового графіка для першого малювання
+            self.fig = plt.figure(figsize=(8, 6))
         else:
             if self.fig is None:
-                self.fig = plt.figure(figsize=(8, 6))  # Якщо немає фігури, створюємо нову
+                self.fig = plt.figure(figsize=(8, 6))
 
-            plt.figure(self.fig.number)  # Використовуємо існуючу фігуру
+            plt.figure(self.fig.number)
 
         first_segment = True
         for x_seg, y_seg in segments:
@@ -28,20 +28,19 @@ class GraphPlotter:
 
         plt.show()
 
-    def plot_data(self, x_values, y_values, label, color="blue"):
+    def plot_data(self, x_values, y_values, label, color="blue", x_display_range=None, y_display_range=None):
         if self.fig is None:
-            self.fig = plt.figure(figsize=(8, 6))  # Якщо немає фігури, створюємо нову
+            self.fig = plt.figure(figsize=(8, 6))
 
-        plt.figure(self.fig.number)  # Використовуємо існуючу фігуру
+        plt.figure(self.fig.number)
         plt.plot(x_values, y_values, color=color, linewidth=2, label=label)
-        self._setup_axes()
+        self._setup_axes(x_display_range, y_display_range)
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.legend(loc='upper right')
         plt.show()
 
     def _setup_axes(self, x_display_range=None, y_display_range=None):
         ax = plt.gca()
-        # Налаштування осей
         ax.spines['right'].set_color('none')
         ax.spines['top'].set_color('none')
         ax.xaxis.set_ticks_position('bottom')
@@ -53,7 +52,6 @@ class GraphPlotter:
             ax.set_xlim(x_display_range)
             ax.set_ylim(y_display_range)
         else:
-            # Автоматичне налаштування для відображення
             xlim = ax.get_xlim()
             ylim = ax.get_ylim()
 
@@ -70,8 +68,7 @@ class GraphPlotter:
         ax.set_aspect('equal', adjustable='box')
 
     def clear_plot(self):
-        # Очищення фігури та графіків
         if self.fig:
-            plt.clf()  # Очищаємо поточну фігуру
-            plt.close(self.fig)  # Закриваємо фігуру
+            plt.clf()
+            plt.close(self.fig)
             self.fig = None
