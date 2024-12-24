@@ -1,4 +1,3 @@
-import sympy as sp
 from sympy import sympify, lambdify, symbols
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,8 +11,7 @@ class GraphApp:
         self.root.title("Graph Plotter")
 
         # Entry for mathematical expression
-        tk.Label(root, text="Enter mathematical expression (e.g., x**2 + 3*x - 5):").grid(row=0, column=0, padx=10,
-                                                                                          pady=5)
+        tk.Label(root, text="Enter mathematical expression e.g., 1/(1+x) :").grid(row=0, column=0, padx=10, pady=5)
         self.expr_entry = tk.Entry(root, width=50)
         self.expr_entry.grid(row=0, column=1, padx=10, pady=5)
 
@@ -35,60 +33,97 @@ class GraphApp:
 
     def parse_expression(self, expr, x_min, x_max):
         try:
-            x = symbols('x')  # Символічна змінна для виразів
-            sym_expr = sympify(expr)  # Перетворення виразу на символьний об’єкт
-            f = lambdify(x, sym_expr, 'numpy')  # Перетворення в функцію
+            x = symbols('x')
+            sym_expr = sympify(expr)
+            f = lambdify(x, sym_expr, 'numpy')
 
-            x_values = np.linspace(x_min, x_max, 1000)
+            # Generate x values
+            x_values = np.linspace(x_min, x_max, 10000)
             y_values = f(x_values)
 
-            return x_values, y_values
+            # Mask to detect valid values (finite and within reasonable range)
+            mask = np.isfinite(y_values)
+
+            segments = []
+            current_x = []
+            current_y = []
+
+            threshold = 50
+
+            for i in range(1, len(x_values)):
+                if mask[i] and mask[i - 1]:
+                    if abs(y_values[i] - y_values[i - 1]) < threshold:
+                        current_x.append(x_values[i])
+                        current_y.append(y_values[i])
+                    else:
+                        if current_x:
+                            segments.append((np.array(current_x), np.array(current_y)))
+                        current_x = [x_values[i]]
+                        current_y = [y_values[i]]
+                else:
+                    if current_x:
+                        segments.append((np.array(current_x), np.array(current_y)))
+                    current_x = []
+                    current_y = []
+
+            if current_x:
+                segments.append((np.array(current_x), np.array(current_y)))
+
+            return segments
+
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to parse expression: {e}")
-            return None, None
+            messagebox.showerror("Error", f"Invalid expression: {e}")
+            return []
 
     def plot_graph(self):
-        # Get user inputs
         expr = self.expr_entry.get()
         x_range = self.range_entry.get()
         color = self.color_var.get()
 
-        # Validate and process inputs
         try:
             x_min, x_max = map(float, x_range.split(','))
         except ValueError:
             messagebox.showerror("Error", "Invalid x range format. Use format: -10,10")
             return
 
-        x_values, y_values = self.parse_expression(expr, x_min, x_max)
-        if x_values is None or y_values is None:
+        # Parse and generate segments
+        segments = self.parse_expression(expr, x_min, x_max)
+        if not segments:
             return
 
-        # Calculate limits for equal scaling
-        y_min, y_max = np.min(y_values), np.max(y_values)
-        y_range = max(abs(y_min), abs(y_max))
-        x_range = max(abs(x_min), abs(x_max))
-        limit = max(x_range, y_range)
-
-        # Plot graph
         plt.figure(figsize=(8, 6))
-        plt.plot(x_values, y_values, color=color, label=expr)
-        plt.axhline(0, color='black', linewidth=0.8)  # X-axis
-        plt.axvline(0, color='black', linewidth=0.8)  # Y-axis
-        plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-        plt.axis([-limit, limit, -limit, limit])  # Set equal limits for both axes
-        plt.gca().set_aspect('equal', adjustable='box')  # Ensure equal scaling
-        plt.title("Graph Plotter")
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.ylim(-20, 20)  # Обмеження для осі Y
-        plt.xlim(-20, 20)
-        plt.legend()
+
+        first_segment = True
+        for x_seg, y_seg in segments:
+            if first_segment:
+                plt.plot(x_seg, y_seg, color=color, linewidth=2, label=expr)
+                first_segment = False
+            else:
+                plt.plot(x_seg, y_seg, color=color, linewidth=2)
+
+        ax = plt.gca()
+        ax.spines['right'].set_color('none')
+        ax.spines['top'].set_color('none')
+        ax.xaxis.set_ticks_position('bottom')
+        ax.spines['bottom'].set_position(('data', 0))
+        ax.yaxis.set_ticks_position('left')
+        ax.spines['left'].set_position(('data', 0))
+
+        ax.set_aspect('equal', adjustable='datalim')
+
+        limit = max(abs(x_min), abs(x_max))
+        plt.xlim(-limit, limit)
+        plt.ylim(-limit, limit)
+
+        # plt.title(f"Graph of {expr}\n", fontsize=14)
+        plt.xlabel("x", fontsize=12)
+        plt.ylabel("y", fontsize=12)
+        plt.grid(True, linestyle='--', alpha=0.6)
+        plt.legend(loc='upper right')
         plt.show()
 
 
-# Main function to run the app
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = GraphApp(root)
-    root.mainloop()
+    tk_root = tk.Tk()
+    app = GraphApp(tk_root)
+    tk_root.mainloop()
