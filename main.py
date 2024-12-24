@@ -60,7 +60,6 @@ class GraphApp:
             messagebox.showerror("Error", "Invalid x range format. Use format: -10,10")
             return
 
-        # Generate data
         x_values, y_values = self.parse_expression(expr, x_min, x_max)
         if x_values is None or y_values is None:
             return
