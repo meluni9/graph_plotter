@@ -55,16 +55,13 @@ class GraphApp:
         range_display = self.range_display_entry.get()
         color = self.color_var.get()
 
-        # Перевірка на обмеження кількості графіків
         if len(self.graphs) >= 5:
             messagebox.showerror("Error", "Maximum number of graphs (5) reached.")
             return
 
         try:
-            # Обробка діапазону X
             x_min, x_max = map(float, range_x.split(','))
 
-            # Обробка діапазону для відображення графіка (X і Y)
             display_range = list(map(float, range_display.split(',')))
             if len(display_range) != 4:
                 raise ValueError("Invalid display range. Please enter four values for x and y ranges.")
@@ -72,48 +69,43 @@ class GraphApp:
             x_display_min, x_display_max, y_display_min, y_display_max = display_range
 
             segments = self.parser.parse_expression(expr, x_min, x_max)
+
+            graph_name = f"Graph {len(self.graphs) + 1}: {expr}"
+            self.graphs.append((graph_name, segments, expr, color))
+            self.update_graph_list()
+
             self.plotter.plot_segments(segments, expr, color=color, first_plot=False,
                                        x_display_range=(x_display_min, x_display_max),
                                        y_display_range=(y_display_min, y_display_max))
-
-            # Додаємо графік до списку
-            graph_name = f"Graph {len(self.graphs) + 1}: {expr}"
-            self.graphs.append((graph_name, segments, expr, color))
-
-            # Оновлюємо список графіків
-            self.update_graph_list()
 
         except ValueError as e:
             messagebox.showerror("Error", str(e))
 
     def load_file(self):
+        if len(self.graphs) >= 5:
+            messagebox.showerror("Error", "Maximum number of graphs (5) reached.")
+            return
         try:
             x_values, y_values = FileLoader.load_file()
             if x_values is not None and y_values is not None:
                 self.plotter.plot_data(x_values, y_values, "Loaded Data", color=self.color_var.get())
 
-                # Додаємо графік до списку
                 graph_name = f"Graph {len(self.graphs) + 1}: Loaded Data"
                 self.graphs.append((graph_name, x_values, y_values, self.color_var.get()))
 
-                # Оновлюємо список графіків
                 self.update_graph_list()
 
         except ValueError as e:
             messagebox.showerror("Error", str(e))
 
     def update_graph_list(self):
-        # Оновлення списку графіків в інтерфейсі
         self.graph_listbox.delete(0, tk.END)
         for graph in self.graphs:
             self.graph_listbox.insert(tk.END, graph[0])
 
     def clear_all_graphs(self):
-        # Очищення всіх графіків
         self.graphs.clear()
-        self.plotter.clear_plot()  # Очищення малюнку
-
-        # Оновлюємо список графіків
+        self.plotter.clear_plot()
         self.update_graph_list()
 
 
