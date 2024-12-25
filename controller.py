@@ -8,6 +8,7 @@ class GraphController:
         self.graphs = []
         self.parser = ExpressionParser()
         self.plotter = GraphPlotter()
+        self.file_loader = FileLoader()
         self.callbacks = []
         self.plotter.set_on_close_callback(self.clear_graphs)
 
@@ -39,7 +40,7 @@ class GraphController:
         if len(self.graphs) >= 5:
             raise ValueError("Maximum number of graphs (5) reached.")
 
-        x_values, y_values = FileLoader.load_file()
+        x_values, y_values = self.file_loader.load_file()
 
         display_range_values = list(map(float, display_range.split(',')))
         x_display_min, x_display_max, y_display_min, y_display_max = display_range_values

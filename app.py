@@ -42,8 +42,12 @@ class GraphApp:
         self.color_dropdown.grid(row=3, column=1, padx=10, pady=5)
 
         tk.Button(self.root, text="Plot Graph", command=self.plot_graph).grid(row=4, column=0, columnspan=2, pady=10)
-        tk.Button(self.root, text="Load Data from File", command=self.load_file).grid(row=5, column=0, columnspan=2,
-                                                                                      pady=10)
+
+        button_frame = tk.Frame(self.root)
+        button_frame.grid(row=5, column=0, columnspan=3, pady=10)
+        tk.Button(button_frame, text="Load Data from File", command=self.load_file).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Export Graph Data", command=self.export_graph_data).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Save Graph as Image", command=self.save_graph_image).pack(side=tk.RIGHT, padx=5)
 
         tk.Label(self.root, text="Graphs:").grid(row=6, column=0, padx=10, pady=5)
         self.graph_listbox = tk.Listbox(self.root, height=5, width=50)
@@ -80,6 +84,12 @@ class GraphApp:
         self.graph_listbox.delete(0, tk.END)
         for graph in self.controller.graphs:
             self.graph_listbox.insert(tk.END, graph[0])
+
+    def export_graph_data(self):
+        ...
+
+    def save_graph_image(self):
+        ...
 
 
 if __name__ == "__main__":
