@@ -19,7 +19,7 @@ class GraphPlotter:
 
             plt.figure(self.fig.number)
 
-        self.fig.canvas.mpl_connect("close_event", self._on_close)
+        self.check_close_event()
 
         first_segment = True
         for x_seg, y_seg in segments:
@@ -31,12 +31,6 @@ class GraphPlotter:
 
         self._setup_axes(x_display_range, y_display_range)
 
-        plt.xlabel("Y", labelpad=-200, fontsize=10, fontweight="bold")
-        plt.ylabel("X", labelpad=-220, fontsize=10, fontweight="bold", rotation=0)
-
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.legend(loc='upper right')
-
         plt.show()
 
     def plot_data(self, x_values, y_values, label, color="blue", x_display_range=None, y_display_range=None):
@@ -45,14 +39,11 @@ class GraphPlotter:
 
         plt.figure(self.fig.number)
 
-        self.fig.canvas.mpl_connect("close_event", self._on_close)
+        self.check_close_event()
 
         plt.plot(x_values, y_values, color=color, linewidth=2, label=label)
         self._setup_axes(x_display_range, y_display_range)
-        plt.xlabel("Y", labelpad=-200, fontsize=10, fontweight="bold")
-        plt.ylabel("X", labelpad=-220, fontsize=10, fontweight="bold", rotation=0)
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.legend(loc='upper right')
+
         plt.show()
 
     def _setup_axes(self, x_display_range=None, y_display_range=None):
@@ -84,6 +75,17 @@ class GraphPlotter:
 
         ax.set_aspect('equal', adjustable='box')
 
+        plt.xlabel("X", fontsize=10, fontweight="bold", labelpad=10)
+        plt.ylabel("Y", fontsize=10, fontweight="bold", labelpad=10, rotation=0)
+
+        plt.text(0.5, 1.05, "Y-axis", transform=plt.gca().transAxes, fontsize=12, fontweight="bold", ha="center",
+                 color="red")
+        plt.text(1.05, 0.5, "X-axis", transform=plt.gca().transAxes, fontsize=12, fontweight="bold", va="center",
+                 rotation=0, color="green")
+
+        plt.grid(True, linestyle='--', alpha=0.6)
+        plt.legend(loc='upper right')
+
     def set_on_close_callback(self, callback):
         self.on_close_callback = callback
 
@@ -95,11 +97,14 @@ class GraphPlotter:
         plt.close(self.fig)
         self.fig = None
 
-    def clear_plot(self):
+    def clear_graphs(self):
         if self.fig:
             plt.clf()
             plt.close(self.fig)
             self.fig = None
+
+    def check_close_event(self):
+        self.fig.canvas.mpl_connect("close_event", self._on_close)
 
     def initialize_toolbar(self):
         if not self.toolbar_initialized:
@@ -110,7 +115,6 @@ class GraphPlotter:
                 self.fig.canvas.manager.toolmanager.remove_tool('save')
                 self.fig.canvas.manager.toolmanager.remove_tool('forward')
                 self.fig.canvas.manager.toolmanager.remove_tool('back')
-                self.toolbar_initialized = True  # Встановлюємо прапорець
+                self.toolbar_initialized = True
             except AttributeError:
                 print("Toolmanager is not available in this backend.")
-

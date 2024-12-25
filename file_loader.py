@@ -48,3 +48,15 @@ class FileLoader:
             return parsed_data[:, 0], parsed_data[:, 1]
         except Exception as e:
             raise ValueError(f"Could not parse CSV or TXT file: {e}")
+
+    def export_data(self, segments):
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                                 filetypes=[("Text files", "*.txt"),
+                                                            ("CSV files", "*.csv"),
+                                                            ("All files", "*.*")])
+        if not file_path:
+            return
+        with open(file_path, 'w') as file:
+            for x_seg, y_seg in segments:
+                for x, y in zip(x_seg, y_seg):
+                    file.write(f"{x},{y}\n")

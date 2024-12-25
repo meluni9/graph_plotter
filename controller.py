@@ -5,7 +5,7 @@ from file_loader import FileLoader
 from graph_plotter import GraphPlotter
 
 
-class GraphController:
+class Controller:
     def __init__(self):
         self.graphs = []
         self.parser = ExpressionParser()
@@ -16,6 +16,10 @@ class GraphController:
 
     def register_callback(self, callback):
         self.callbacks.append(callback)
+
+    def manage_callbacks(self):
+        for callback in self.callbacks:
+            callback()
 
     def add_graph(self, expr, range_x, display_range, color):
         if len(self.graphs) >= 5:
@@ -30,8 +34,7 @@ class GraphController:
         graph_name = f"Graph {len(self.graphs) + 1}: {expr}"
         self.graphs.append((graph_name, segments, expr, color))
 
-        for callback in self.callbacks:
-            callback()
+        self.manage_callbacks()
 
         x_display_min, x_display_max, y_display_min, y_display_max = display_range_values
         self.plotter.plot_segments(segments, expr, color=color, first_plot=False,
@@ -51,13 +54,24 @@ class GraphController:
             graph_name = f"Graph {len(self.graphs) + 1}: Loaded Data"
             self.graphs.append((graph_name, x_values, y_values, color))
 
-            for callback in self.callbacks:
-                callback()
+            self.manage_callbacks()
 
             self.plotter.plot_data(x_values, y_values, "Loaded Data", color=color,
                                    x_display_range=(x_display_min, x_display_max),
                                    y_display_range=(y_display_min, y_display_max))
 
+    def export_data(self, selected_index):
+        if not (0 <= selected_index < len(self.graphs)):
+            raise ValueError("Invalid graph selection.")
+
+        graph = self.graphs[selected_index]
+        graph_name, segments, expr, color = graph
+
+        try:
+            self.file_loader.export_data(segments)
+            messagebox.showinfo("Success", "Graph data exported successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save graph: {e}")
 
     def save_image(self):
         if self.plotter.fig:
@@ -73,7 +87,6 @@ class GraphController:
 
     def clear_graphs(self):
         self.graphs.clear()
-        self.plotter.clear_plot()
-        for callback in self.callbacks:
-            callback()
+        self.plotter.clear_graphs()
+        self.manage_callbacks()
         self.plotter.toolbar_initialized = False
