@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import Event
+plt.rcParams['toolbar'] = 'toolmanager'
 
 
 class GraphPlotter:
@@ -7,6 +8,7 @@ class GraphPlotter:
         self.default_color = "blue"
         self.fig = None
         self.on_close_callback = None
+        self.toolbar_initialized = False
 
     def plot_segments(self, segments, expr, color="blue", first_plot=True, x_display_range=None, y_display_range=None):
         if first_plot:
@@ -54,6 +56,7 @@ class GraphPlotter:
         plt.show()
 
     def _setup_axes(self, x_display_range=None, y_display_range=None):
+        self.initialize_toolbar()
         ax = plt.gca()
         ax.spines['right'].set_color('none')
         ax.spines['top'].set_color('none')
@@ -97,3 +100,17 @@ class GraphPlotter:
             plt.clf()
             plt.close(self.fig)
             self.fig = None
+
+    def initialize_toolbar(self):
+        if not self.toolbar_initialized:
+            try:
+                self.fig.canvas.manager.toolmanager.remove_tool('zoom')
+                self.fig.canvas.manager.toolmanager.remove_tool('subplots')
+                self.fig.canvas.manager.toolmanager.remove_tool('help')
+                self.fig.canvas.manager.toolmanager.remove_tool('save')
+                self.fig.canvas.manager.toolmanager.remove_tool('forward')
+                self.fig.canvas.manager.toolmanager.remove_tool('back')
+                self.toolbar_initialized = True  # Встановлюємо прапорець
+            except AttributeError:
+                print("Toolmanager is not available in this backend.")
+

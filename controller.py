@@ -1,3 +1,5 @@
+from tkinter import filedialog, messagebox
+
 from expression_parser import ExpressionParser
 from file_loader import FileLoader
 from graph_plotter import GraphPlotter
@@ -56,8 +58,22 @@ class GraphController:
                                    x_display_range=(x_display_min, x_display_max),
                                    y_display_range=(y_display_min, y_display_max))
 
+
+    def save_image(self):
+        if self.plotter.fig:
+            file_path = filedialog.asksaveasfilename(defaultextension=".png",
+                                                     filetypes=[("PNG files", "*.png"),
+                                                                ("PDF files", "*.pdf"),
+                                                                ("All files", "*.*")])
+            if file_path:
+                self.plotter.fig.savefig(file_path)
+                messagebox.showinfo("Success", "Graph image saved successfully!")
+        else:
+            messagebox.showerror("Error", "No graph to save!")
+
     def clear_graphs(self):
         self.graphs.clear()
         self.plotter.clear_plot()
         for callback in self.callbacks:
             callback()
+        self.plotter.toolbar_initialized = False
