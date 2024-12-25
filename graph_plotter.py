@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
+from matplotlib.backend_bases import Event
+
 
 class GraphPlotter:
     def __init__(self):
         self.default_color = "blue"
         self.fig = None
+        self.on_close_callback = None  # Додано для зберігання колбеку на закриття вікна
 
     def plot_segments(self, segments, expr, color="blue", first_plot=True, x_display_range=None, y_display_range=None):
         if first_plot:
@@ -13,6 +16,9 @@ class GraphPlotter:
                 self.fig = plt.figure(figsize=(8, 6))
 
             plt.figure(self.fig.number)
+
+        # Додано обробник закриття вікна
+        self.fig.canvas.mpl_connect("close_event", self._on_close)
 
         first_segment = True
         for x_seg, y_seg in segments:
@@ -70,6 +76,17 @@ class GraphPlotter:
             ax.set_ylim(y_center - max_range / 2, y_center + max_range / 2)
 
         ax.set_aspect('equal', adjustable='box')
+
+    def set_on_close_callback(self, callback):
+        self.on_close_callback = callback
+
+    def _on_close(self, event: Event):
+        if self.on_close_callback:
+            self.on_close_callback()
+
+        plt.clf()
+        plt.close(self.fig)
+        self.fig = None
 
     def clear_plot(self):
         if self.fig:

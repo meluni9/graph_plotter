@@ -10,6 +10,9 @@ class GraphController:
         self.plotter = GraphPlotter()
         self.callbacks = []
 
+        # Встановлюємо колбек очищення графіків
+        self.plotter.set_on_close_callback(self.clear_graphs)
+
     def register_callback(self, callback):
         self.callbacks.append(callback)
 
@@ -52,7 +55,8 @@ class GraphController:
                                    x_display_range=(x_display_min, x_display_max),
                                    y_display_range=(y_display_min, y_display_max))
 
-
     def clear_graphs(self):
         self.graphs.clear()
         self.plotter.clear_plot()
+        for callback in self.callbacks:
+            callback()
