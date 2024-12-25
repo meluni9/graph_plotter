@@ -9,8 +9,6 @@ class GraphController:
         self.parser = ExpressionParser()
         self.plotter = GraphPlotter()
         self.callbacks = []
-
-        # Встановлюємо колбек очищення графіків
         self.plotter.set_on_close_callback(self.clear_graphs)
 
     def register_callback(self, callback):
@@ -49,8 +47,10 @@ class GraphController:
         if x_values is not None and y_values is not None:
             graph_name = f"Graph {len(self.graphs) + 1}: Loaded Data"
             self.graphs.append((graph_name, x_values, y_values, color))
+
             for callback in self.callbacks:
                 callback()
+
             self.plotter.plot_data(x_values, y_values, "Loaded Data", color=color,
                                    x_display_range=(x_display_min, x_display_max),
                                    y_display_range=(y_display_min, y_display_max))

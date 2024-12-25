@@ -6,7 +6,7 @@ class GraphPlotter:
     def __init__(self):
         self.default_color = "blue"
         self.fig = None
-        self.on_close_callback = None  # Додано для зберігання колбеку на закриття вікна
+        self.on_close_callback = None
 
     def plot_segments(self, segments, expr, color="blue", first_plot=True, x_display_range=None, y_display_range=None):
         if first_plot:
@@ -17,7 +17,6 @@ class GraphPlotter:
 
             plt.figure(self.fig.number)
 
-        # Додано обробник закриття вікна
         self.fig.canvas.mpl_connect("close_event", self._on_close)
 
         first_segment = True
@@ -43,8 +42,13 @@ class GraphPlotter:
             self.fig = plt.figure(figsize=(8, 6))
 
         plt.figure(self.fig.number)
+
+        self.fig.canvas.mpl_connect("close_event", self._on_close)
+
         plt.plot(x_values, y_values, color=color, linewidth=2, label=label)
         self._setup_axes(x_display_range, y_display_range)
+        plt.xlabel("Y", labelpad=-200, fontsize=10, fontweight="bold")
+        plt.ylabel("X", labelpad=-220, fontsize=10, fontweight="bold", rotation=0)
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.legend(loc='upper right')
         plt.show()
