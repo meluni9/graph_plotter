@@ -1,7 +1,7 @@
 from tkinter import filedialog, messagebox
 
 from expression_parser import ExpressionParser
-from file_loader import FileLoader
+from file_manager import FileManager
 from graph_plotter import GraphPlotter
 
 
@@ -10,7 +10,7 @@ class Controller:
         self.graphs = []
         self.parser = ExpressionParser()
         self.plotter = GraphPlotter()
-        self.file_loader = FileLoader()
+        self.file_manager = FileManager()
         self.callbacks = []
         self.plotter.set_on_close_callback(self.clear_graphs)
 
@@ -45,7 +45,7 @@ class Controller:
         if len(self.graphs) >= 5:
             raise ValueError("Maximum number of graphs (5) reached.")
 
-        x_values, y_values = self.file_loader.load_file()
+        x_values, y_values = self.file_manager.load_file()
 
         display_range_values = list(map(float, display_range.split(',')))
         x_display_min, x_display_max, y_display_min, y_display_max = display_range_values
@@ -68,7 +68,7 @@ class Controller:
         graph_name, segments, expr, color = graph
 
         try:
-            self.file_loader.export_data(segments)
+            self.file_manager._export_data(segments)
             messagebox.showinfo("Success", "Graph data exported successfully!")
         except Exception as e:
             messagebox.showerror("Error", f"Could not save graph: {e}")

@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+
 from controller import Controller
 
 
@@ -57,7 +58,7 @@ class App:
         tk.Button(button_frame, text="Save Graph as Image", command=self.save_image).pack(side=tk.RIGHT, padx=5)
 
         tk.Button(self.root, text="Clear All Graphs", command=self.clear_graphs).grid(row=6, column=0, columnspan=2,
-                                                                                         pady=10)
+                                                                                      pady=10)
 
     def _create_graph_list(self):
         tk.Label(self.root, text="Graphs:").grid(row=7, column=0, padx=10, pady=5)
