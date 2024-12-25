@@ -23,6 +23,10 @@ class GraphPlotter:
                 plt.plot(x_seg, y_seg, color=color, linewidth=2)
 
         self._setup_axes(x_display_range, y_display_range)
+
+        plt.xlabel("Y", labelpad=-200, fontsize=10, fontweight="bold")
+        plt.ylabel("X", labelpad=-220, fontsize=10, fontweight="bold", rotation=0)
+
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.legend(loc='upper right')
 

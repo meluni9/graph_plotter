@@ -15,6 +15,15 @@ class GraphApp:
         self._build_ui()
 
     def _build_ui(self):
+        window_width = 800
+        window_height = 400
+
+        screen_width = self.root.winfo_screenwidth()
+        position_x = screen_width - window_width - 100
+        position_y = 150
+
+        self.root.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
+
         tk.Label(self.root, text="Enter mathematical expression e.g., 1/(1+x) :").grid(row=0, column=0, padx=10, pady=5)
         self.expr_entry = tk.Entry(self.root, width=50)
         self.expr_entry.grid(row=0, column=1, padx=10, pady=5)
