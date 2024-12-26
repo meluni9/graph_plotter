@@ -2,6 +2,7 @@ import re
 import numpy as np
 from tkinter import filedialog
 
+
 class FileManager:
     def load_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
@@ -37,12 +38,11 @@ class FileManager:
                 raise ValueError(f"Invalid line format: {line.strip()}")
         return np.array(x_values), np.array(y_values)
 
-    @staticmethod
-    def _match_format(line):
+    def _match_format(self, line):
         return re.match(r'\(\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\)', line.strip())
 
-    @staticmethod
-    def _parse_csv_or_txt(data):
+
+    def _parse_csv_or_txt(self, data):
         try:
             parsed_data = np.loadtxt(data, delimiter=',')
             if parsed_data.shape[1] != 2:
@@ -51,8 +51,7 @@ class FileManager:
         except Exception as e:
             raise ValueError(f"Could not parse CSV or TXT file: {e}")
 
-    @staticmethod
-    def _export_data(segments):
+    def _export_data(self, segments):
         file_path = filedialog.asksaveasfilename(defaultextension=".txt",
                                                  filetypes=[("Text files", "*.txt"),
                                                             ("CSV files", "*.csv"),

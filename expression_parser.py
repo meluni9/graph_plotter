@@ -3,7 +3,7 @@ from sympy import symbols, sympify, lambdify
 
 class ExpressionParser:
     def __init__(self):
-        self.threshold = 50  # Максимальний різкий стрибок для розбиття графіка
+        self.threshold = 50
 
     def parse_expression(self, expr, x_min, x_max):
         try:

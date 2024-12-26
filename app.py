@@ -15,6 +15,8 @@ class App:
         self._setup_window()
         self._create_widgets()
 
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
     def _setup_window(self):
         window_width, window_height = 800, 400
         screen_width = self.root.winfo_screenwidth()
@@ -85,9 +87,12 @@ class App:
         self.controller.clear_graphs()
 
     def update_graph_list(self):
-        self.graph_listbox.delete(0, tk.END)
-        for graph in self.controller.graphs:
-            self.graph_listbox.insert(tk.END, graph[0])
+        try:
+            self.graph_listbox.delete(0, tk.END)
+            for graph in self.controller.graphs:
+                self.graph_listbox.insert(tk.END, graph[0])
+        except Exception as e:
+            print(e)
 
     def export_data(self):
         selected = self.graph_listbox.curselection()
@@ -102,6 +107,10 @@ class App:
 
     def save_image(self):
         self.controller.save_image()
+
+    def on_close(self):
+        self.controller.clear_graphs()
+        self.root.destroy()
 
 
 if __name__ == "__main__":
