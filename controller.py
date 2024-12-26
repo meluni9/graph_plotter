@@ -1,4 +1,4 @@
-from tkinter import filedialog, messagebox
+from tkinter import messagebox
 
 from expression_parser import ExpressionParser
 from file_manager import FileManager
@@ -68,22 +68,10 @@ class Controller:
         graph_name, segments, expr, color = graph
 
         try:
-            self.file_manager._export_data(segments)
+            self.file_manager._export_file(segments)
             messagebox.showinfo("Success", "Graph data exported successfully!")
         except Exception as e:
             messagebox.showerror("Error", f"Could not save graph: {e}")
-
-    def save_image(self):
-        if self.plotter.fig:
-            file_path = filedialog.asksaveasfilename(defaultextension=".png",
-                                                     filetypes=[("PNG files", "*.png"),
-                                                                ("PDF files", "*.pdf"),
-                                                                ("All files", "*.*")])
-            if file_path:
-                self.plotter.fig.savefig(file_path)
-                messagebox.showinfo("Success", "Graph image saved successfully!")
-        else:
-            messagebox.showerror("Error", "No graph to save!")
 
     def clear_graphs(self):
         self.graphs.clear()

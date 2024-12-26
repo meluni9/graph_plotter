@@ -57,7 +57,6 @@ class App:
         button_frame.grid(row=5, column=0, columnspan=2, pady=10)
         tk.Button(button_frame, text="Load Data from File", command=self.load_file).pack(side=tk.LEFT, padx=5)
         tk.Button(button_frame, text="Export Graph Data", command=self.export_data).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="Save Graph as Image", command=self.save_image).pack(side=tk.RIGHT, padx=5)
 
         tk.Button(self.root, text="Clear All Graphs", command=self.clear_graphs).grid(row=6, column=0, columnspan=2,
                                                                                       pady=10)
@@ -104,9 +103,6 @@ class App:
             self.controller.export_data(selected[0])
         except Exception as e:
             messagebox.showerror("Error", f"Could not save graph: {e}")
-
-    def save_image(self):
-        self.controller.save_image()
 
     def on_close(self):
         self.controller.clear_graphs()

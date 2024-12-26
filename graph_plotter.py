@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import Event
-plt.rcParams['toolbar'] = 'toolmanager'
-
 
 class GraphPlotter:
     def __init__(self):
@@ -47,7 +45,6 @@ class GraphPlotter:
         plt.show()
 
     def _setup_axes(self, x_display_range=None, y_display_range=None):
-        self.initialize_toolbar()
         ax = plt.gca()
         ax.spines['right'].set_color('none')
         ax.spines['top'].set_color('none')
@@ -105,16 +102,3 @@ class GraphPlotter:
 
     def check_close_event(self):
         self.fig.canvas.mpl_connect("close_event", self._on_close)
-
-    def initialize_toolbar(self):
-        if not self.toolbar_initialized:
-            try:
-                self.fig.canvas.manager.toolmanager.remove_tool('zoom')
-                self.fig.canvas.manager.toolmanager.remove_tool('subplots')
-                self.fig.canvas.manager.toolmanager.remove_tool('help')
-                self.fig.canvas.manager.toolmanager.remove_tool('save')
-                self.fig.canvas.manager.toolmanager.remove_tool('forward')
-                self.fig.canvas.manager.toolmanager.remove_tool('back')
-                self.toolbar_initialized = True
-            except AttributeError:
-                print("Toolmanager is not available in this backend.")

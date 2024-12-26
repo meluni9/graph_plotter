@@ -1,46 +1,19 @@
-import re
 import numpy as np
 from tkinter import filedialog
 
 
 class FileManager:
     def load_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
+        file_path = self.get_file_path()
         if not file_path:
             return None, None
         try:
             with open(file_path, 'r') as file:
                 data = file.readlines()
-
-            if self.is_xy_pair_format(data):
-                return self.parse_xy_pairs(data)
-            else:
-                return self._parse_csv_or_txt(data)
+            return self._parse_csv_or_txt(data)
 
         except Exception as e:
             raise ValueError(f"Could not load file: {e}")
-
-    def is_xy_pair_format(self, data):
-        for line in data:
-            if self._match_format(line):
-                return True
-        return False
-
-    def parse_xy_pairs(self, data):
-        x_values = []
-        y_values = []
-        for line in data:
-            match = self._match_format(line)
-            if match:
-                x_values.append(float(match.group(1)))
-                y_values.append(float(match.group(2)))
-            else:
-                raise ValueError(f"Invalid line format: {line.strip()}")
-        return np.array(x_values), np.array(y_values)
-
-    def _match_format(self, line):
-        return re.match(r'\(\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\)', line.strip())
-
 
     def _parse_csv_or_txt(self, data):
         try:
@@ -51,14 +24,18 @@ class FileManager:
         except Exception as e:
             raise ValueError(f"Could not parse CSV or TXT file: {e}")
 
-    def _export_data(self, segments):
-        file_path = filedialog.asksaveasfilename(defaultextension=".txt",
-                                                 filetypes=[("Text files", "*.txt"),
-                                                            ("CSV files", "*.csv"),
-                                                            ("All files", "*.*")])
+    def _export_file(self, segments):
+        file_path = self.get_file_path()
         if not file_path:
             return
         with open(file_path, 'w') as file:
             for x_seg, y_seg in segments:
                 for x, y in zip(x_seg, y_seg):
                     file.write(f"{x},{y}\n")
+
+    def get_file_path(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                                 filetypes=[("Text files", "*.txt"),
+                                                            ("CSV files", "*.csv"),
+                                                            ("All files", "*.*")])
+        return file_path
